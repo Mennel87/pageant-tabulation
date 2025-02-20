@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pageant Tabulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto bg-white p-6 shadow-lg rounded-lg">
+        <h2 class="text-xl font-bold text-center mb-4">Pageant Tabulation Form</h2>
+        <form id="tabulationForm">
+            <div class="mb-4">
+                <label class="block font-semibold">Judge Name:</label>
+                <input type="text" id="judgeName" class="w-full p-2 border rounded" required>
+            </div>
+            <table class="w-full border-collapse border text-center">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-2">Contestant</th>
+                        <th class="border p-2">Beauty (30%)</th>
+                        <th class="border p-2">Talent (40%)</th>
+                        <th class="border p-2">Q&A (30%)</th>
+                        <th class="border p-2 admin-only">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="contestants">
+                    <tr>
+                        <td class="border p-2">Contestant 1</td>
+                        <td class="border p-2"><input type="number" class="score beauty w-16" min="0" max="30"></td>
+                        <td class="border p-2"><input type="number" class="score talent w-16" min="0" max="40"></td>
+                        <td class="border p-2"><input type="number" class="score qa w-16" min="0" max="30"></td>
+                        <td class="border p-2 total admin-only">0</td>
+                    </tr>
+                    <tr>
+                        <td class="border p-2">Contestant 2</td>
+                        <td class="border p-2"><input type="number" class="score beauty w-16" min="0" max="30"></td>
+                        <td class="border p-2"><input type="number" class="score talent w-16" min="0" max="40"></td>
+                        <td class="border p-2"><input type="number" class="score qa w-16" min="0" max="30"></td>
+                        <td class="border p-2 total admin-only">0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Calculate Results</button>
+        </form>
+        <div id="adminSection" class="hidden">
+            <h3 class="mt-4 text-lg font-semibold">Winner: <span id="winner" class="text-red-500"></span></h3>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.score').forEach(input => {
+            input.addEventListener('input', function() {
+                let row = this.closest('tr');
+                let beauty = parseFloat(row.querySelector('.beauty').value) || 0;
+                let talent = parseFloat(row.querySelector('.talent').value) || 0;
+                let qa = parseFloat(row.querySelector('.qa').value) || 0;
+                let total = beauty + talent + qa;
+                row.querySelector('.total').innerText = total;
+            });
+        });
+
+        document.getElementById('tabulationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let contestants = document.querySelectorAll('#contestants tr');
+            let highestScore = 0;
+            let winner = '';
+            
+            contestants.forEach(row => {
+                let contestantName = row.cells[0].innerText;
+                let totalScore = parseFloat(row.querySelector('.total').innerText) || 0;
+                if (totalScore > highestScore) {
+                    highestScore = totalScore;
+                    winner = contestantName;
+                }
+            });
+            
+            document.getElementById('winner').innerText = winner;
+            document.getElementById('adminSection').classList.remove('hidden');
+        });
+
+        // Simulating admin login - change this condition as needed
+        let isAdmin = prompt("Enter admin password") === "admin123";
+        if (!isAdmin) {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+        }
+    </script>
+</body>
+</html>
